@@ -1,0 +1,30 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex-grow: 1;
+}
+
+header, footer {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+#collage {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 3rem;
+}
+
+img {
+    height: 50vh;
+    max-width: 30%;
+}
