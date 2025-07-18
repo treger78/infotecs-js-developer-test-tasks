@@ -1,5 +1,8 @@
 const COLLAGE = document.getElementById('collage');
+const MODAL = document.getElementById('modal');
 const selectLimit = document.getElementById('imgLimit');
+
+let isPaused = false;
 
 const getImgLimitValue = () => selectLimit.value;
 
@@ -20,6 +23,7 @@ const createAndAppendNewImg = (imgArray) => {
 };
 
 const updateCollage = async (mode = 'update') => {
+    if (isPaused) return;
     if (mode === 'changeLimit') COLLAGE.replaceChildren();
 
     const response = await requestImages(1);
@@ -31,11 +35,41 @@ const updateCollage = async (mode = 'update') => {
 
 const imgLimitHandler = () => selectLimit.addEventListener('change', () => updateCollage(mode = 'changeLimit'));
 
+const imgClickHanlder = () => {
+    COLLAGE.addEventListener('click', (event) => {
+        const target = event.target;
+
+        if (target.tagName !== 'IMG') return;
+
+        const modalImg = document.getElementById('modal-img');
+
+        modalImg.src = target.src;
+        MODAL.style.display = 'flex';
+        isPaused = true;
+    });
+};
+
+const closeModalHandlers = () => {
+    document.getElementById('close-modal-btn').addEventListener('click', () => {
+        MODAL.style.display = 'none';
+        isPaused = false;
+    });
+
+    MODAL.addEventListener('click', (event) => {
+        if (event.target.id === 'modal') {
+            MODAL.style.display = 'none';
+            isPaused = false;
+        }
+    });
+};
+
 const initCollage = async () => {
     const response = await requestImages(getImgLimitValue());
 
     createAndAppendNewImg(response.message);
 
+    imgClickHanlder();
+    closeModalHandlers();
     imgLimitHandler();
 
     setInterval(() => {
