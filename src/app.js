@@ -1,5 +1,6 @@
 const COLLAGE = document.getElementById('collage');
 const MODAL = document.getElementById('modal');
+const modalImg = document.getElementById('modal-img');
 const selectLimit = document.getElementById('imgLimit');
 
 let isPaused = false;
@@ -41,8 +42,6 @@ const imgClickHanlder = () => {
 
         if (target.tagName !== 'IMG') return;
 
-        const modalImg = document.getElementById('modal-img');
-
         modalImg.src = target.src;
         MODAL.style.display = 'flex';
         isPaused = true;
@@ -63,6 +62,28 @@ const closeModalHandlers = () => {
     });
 };
 
+const downloadBtnHandler = () => {
+    document.getElementById('download-btn').addEventListener('click', async () => {
+        const response = await fetch(modalImg.src);
+        const blob = await response.blob();
+
+        const blobURL = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+
+        a.href = blobURL;
+        a.download = 'dog.jpg';
+
+        document.body.append(a);
+
+        a.click();
+
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobURL);
+        }, 100);
+    });
+};
+
 const initCollage = async () => {
     const response = await requestImages(getImgLimitValue());
 
@@ -70,6 +91,7 @@ const initCollage = async () => {
 
     imgClickHanlder();
     closeModalHandlers();
+    downloadBtnHandler();
     imgLimitHandler();
 
     setInterval(() => {

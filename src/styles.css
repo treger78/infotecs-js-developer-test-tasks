@@ -63,3 +63,10 @@ img {
     padding: 10px;
     cursor: pointer;
 }
+
+#download-btn {
+    position: absolute;
+    bottom: 15vh;
+    right: auto;
+    left: auto;
+}
