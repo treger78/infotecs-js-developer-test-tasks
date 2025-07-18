@@ -7,10 +7,20 @@ let isPaused = false;
 
 const getImgLimitValue = () => selectLimit.value;
 
-const imgCounter = () => document.querySelectorAll('img').length;
+const imgCounter = () => COLLAGE.querySelectorAll('img').length;
 
 const requestImages = async (imgLimitNumber) => {
-    return (await fetch(`https://dog.ceo/api/breeds/image/random/${imgLimitNumber}`)).json();
+    try {
+        const response = await fetch(`https://dog.ceo/api/breeds/image/random/${imgLimitNumber}`);
+
+        if (!response.ok) throw new Error('Error during request images');
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching images:', error);
+
+        return { message: [] };
+    }
 };
 
 const createAndAppendNewImg = (imgArray) => {
@@ -18,6 +28,7 @@ const createAndAppendNewImg = (imgArray) => {
         const img = document.createElement('img');
 
         img.src = image;
+        img.alt = 'Random dog image';
 
         COLLAGE.append(img);
     });
@@ -29,12 +40,12 @@ const updateCollage = async (mode = 'update') => {
 
     const response = await requestImages(1);
 
-    if (imgCounter() >= getImgLimitValue()) COLLAGE.firstChild.remove();
+    if (imgCounter() >= getImgLimitValue()) COLLAGE?.firstChild.remove();
 
     createAndAppendNewImg(response.message);
 };
 
-const imgLimitHandler = () => selectLimit.addEventListener('change', () => updateCollage(mode = 'changeLimit'));
+const imgLimitHandler = () => selectLimit.addEventListener('change', () => updateCollage('changeLimit'));
 
 const imgClickHanlder = () => {
     COLLAGE.addEventListener('click', (event) => {
@@ -64,23 +75,28 @@ const closeModalHandlers = () => {
 
 const downloadBtnHandler = () => {
     document.getElementById('download-btn').addEventListener('click', async () => {
-        const response = await fetch(modalImg.src);
-        const blob = await response.blob();
+        try {
+            const response = await fetch(modalImg.src);
+            const blob = await response.blob();
 
-        const blobURL = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+            const blobURL = URL.createObjectURL(blob);
+            const a = document.createElement('a');
 
-        a.href = blobURL;
-        a.download = 'dog.jpg';
+            a.href = blobURL;
+            a.download = 'dog.jpg';
+            a.style.display = 'none';
 
-        document.body.append(a);
+            document.body.append(a);
 
-        a.click();
+            a.click();
 
-        setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(blobURL);
-        }, 100);
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobURL);
+            }, 100);   
+        } catch (error) {
+            console.error('Download failed:', error);
+        }
     });
 };
 

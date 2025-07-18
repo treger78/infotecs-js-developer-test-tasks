@@ -30,10 +30,11 @@ main {
     margin-top: 3rem;
 }
 
-img {
+#collage img {
     height: 50vh;
     max-width: 25rem;
     margin: 1rem;
+    cursor: pointer;
 }
 
 #modal {
@@ -66,7 +67,6 @@ img {
 
 #download-btn {
     position: absolute;
-    bottom: 15vh;
-    right: auto;
-    left: auto;
+    top: 20px;
+    left: 20px;
 }
