@@ -1,3 +1,7 @@
+import  { Pagination } from "./pagination.js";
+
+let allUsers = [];
+
 const getUsers = async () => {
     try {
         const response = await fetch('https://dummyjson.com/users?limit=0');
@@ -97,6 +101,8 @@ const renderTheadData = (thDataArray) => {
     const theadRow = document.getElementById('users-table-thead-row');
     const fragment = document.createDocumentFragment();
 
+    theadRow.innerHTML = '';
+
     thDataArray.forEach(element => {
         const th = document.createElement('th');
 
@@ -112,13 +118,19 @@ const renderTbodyData = (users) => {
     const tbody = document.getElementById('users-table-tbody');
     const fragment = document.createDocumentFragment();
 
+    tbody.innerHTML = '';
+
     users.forEach(user => {
         const tr = document.createElement('tr');
 
-        Object.values(user).forEach(value => {
+        Object.entries(user).forEach(element => {
+            const key = element[0];
+            const value = element[1];
+
             const td = document.createElement('td');
 
             td.textContent = value;
+            td.className = key;
 
             tr.appendChild(td);
         });
@@ -130,10 +142,19 @@ const renderTbodyData = (users) => {
 };
 
 const initUsersTable = async () => {
-    const users = transformUsers(await getUsers());
+    allUsers = transformUsers(await getUsers());
 
-    renderTheadData(Object.keys(users[0]));
-    renderTbodyData(users);
+    const pagination = new Pagination({
+        onPageChange: () => {
+            renderTbodyData(pagination.getPaginatedData(allUsers));
+        }
+    });
+
+    pagination.setTotalItems(allUsers.length);
+    pagination.setupPaginationControls();
+
+    renderTheadData(Object.keys(allUsers[0]));
+    renderTbodyData(pagination.getPaginatedData(allUsers));
 
     //const posts = await getPostsByUserID(2);
     //console.log(posts);

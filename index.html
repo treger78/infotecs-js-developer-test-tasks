@@ -12,6 +12,25 @@
     </header>
 
     <main>
+        <div class="pagination-controls">
+            <div class="pagination-settings">
+                <label for="rows-per-page">Строк на странице:</label>
+                <select id="rows-per-page">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="pagination-navigation">
+                <button id="first-page">Первая</button>
+                <button id="prev-page">Предыдущая</button>
+                <span id="page-info"></span>
+                <button id="next-page">Следующая</button>
+                <button id="last-page">Последняя</button>
+            </div>
+        </div>
         <div id="users-table-container">
             <table id="users-table">
                 <caption>Users table</caption>
@@ -24,6 +43,6 @@
     </main>
 
     <footer>implemented by Ilia Pustograev</footer>
-    <script src="./src/app.js"></script>
+    <script type="module" src="./src/app.js"></script>
 </body>
 </html>
