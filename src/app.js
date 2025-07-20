@@ -278,8 +278,14 @@ const initUsersTable = async () => {
     renderTheadData(Object.keys(allUsers[0]), pagination);
     renderTbodyData(pagination.getPaginatedData(allUsers));
 
-    //const posts = await getPostsByUserID(2);
-    //console.log(posts);
+    //TODO: при клике на строку, находить id этого пользователя, делать запрос постов по id, после
+    //получения ответа отображать слева сайдбар ~на пол ширины страницы для отображения постов
+    //по структуре можно каждый пост сделать div'ом или section, внутри которых данные друг под другом
+    //в следующем порядке: title, body, tags, reactions
+    /*
+    const posts = await getPostsByUserID(2);
+    console.log(posts);
+    */
 };
 
 initUsersTable();
