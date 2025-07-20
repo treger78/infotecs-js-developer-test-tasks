@@ -12,6 +12,14 @@ export class Pagination {
     this.rowsPerPageOptions = rowsPerPageOptions;
   }
 
+  get currentPage() {
+    return this._currentPage;
+  }
+
+  set currentPage(page) {
+    this._currentPage = page;
+  }
+
   setTotalItems(total) {
     this.totalItems = total;
     this.updatePaginationInfo();

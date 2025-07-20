@@ -12,7 +12,7 @@ header, footer {
 
 #users-table-container {
     max-width: 95%;
-    max-height: 80vh;
+    max-height: 70vh;
     overflow: auto;
     margin: 1rem auto;
     border: 1px solid lightgray;
@@ -37,9 +37,37 @@ header, footer {
     font-weight: bold;
     color: #1fa500;
     padding: 0.5rem;
-    position: sticky;
+    padding-right: 20px;
+    position: relative;
     top: 0;
     border: 1px solid lightgray;
+}
+
+#users-table thead th:hover {
+    background-color: #d4e8b4;
+}
+
+#users-table thead th::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    opacity: 0.3;
+}
+
+#users-table thead th.sort-asc::after {
+    border-bottom: 5px solid #1fa500;
+    opacity: 1;
+}
+
+#users-table thead th.sort-desc::after {
+    border-top: 5px solid #1fa500;
+    opacity: 1;
 }
 
 #users-table tbody td {
@@ -62,4 +90,18 @@ header, footer {
 
 .phone {
     white-space: nowrap;
+}
+
+.sorting-options {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.sorting-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 }

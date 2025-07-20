@@ -1,6 +1,11 @@
 import  { Pagination } from "./pagination.js";
 
 let allUsers = [];
+let sortMode = 'global'; // 'global' или 'page'
+let currentSort = {
+    column: null,
+    direction: 'asc',
+};
 
 const getUsers = async () => {
     try {
@@ -97,16 +102,30 @@ const getPostsByUserID = async (userID) => {
     }
 };
 
-const renderTheadData = (thDataArray) => {
+const renderTheadData = (thDataArray, pagination) => {
     const theadRow = document.getElementById('users-table-thead-row');
     const fragment = document.createDocumentFragment();
 
     theadRow.innerHTML = '';
 
-    thDataArray.forEach(element => {
+    thDataArray.forEach(columnKey => {
         const th = document.createElement('th');
 
-        th.textContent = element;
+        th.textContent = columnKey;
+        th.style.cursor = 'pointer';
+
+        th.addEventListener('click', () => {
+            const newDirection = currentSort.column === columnKey && currentSort.direction === 'asc' 
+                ? 'desc' 
+                : 'asc';
+            
+            currentSort = {
+                column: columnKey,
+                direction: newDirection,
+            };
+
+            sortTable(pagination);
+        });
 
         fragment.appendChild(th);
     });
@@ -141,19 +160,122 @@ const renderTbodyData = (users) => {
     tbody.appendChild(fragment);
 };
 
+const sortTable = (pagination) => {
+    if (!currentSort.column) return;
+
+    // Запоминаем текущую страницу перед сортировкой
+    const prevPage = pagination.currentPage;
+
+    if (sortMode === 'global') {
+        // Сортировка всех данных
+        allUsers.sort((a, b) => compareValues(a, b, currentSort));
+
+        // Возвращаемся на ту же страницу (если она существует)
+        const totalPages = pagination.getTotalPages();
+        const newPage = Math.min(prevPage, totalPages);
+
+        pagination.goToPage(newPage);
+
+        renderTbodyData(pagination.getPaginatedData(allUsers));
+    } else {
+        // Сортировка только текущей страницы
+        const currentPageData = pagination.getPaginatedData(allUsers);
+
+        currentPageData.sort((a, b) => compareValues(a, b, currentSort));
+
+        renderTbodyData(currentPageData);
+    }
+
+    updateSortIndicator();
+};
+
+const compareValues = (a, b, sortConfig) => {
+    let valueA = a[sortConfig.column];
+    let valueB = b[sortConfig.column];
+
+    // Обработка отсутствующих значений
+    if (valueA === undefined || valueA === null) valueA = '';
+    if (valueB === undefined || valueB === null) valueB = '';
+
+    // Для числовых значений
+    if (['id', 'age', 'height', 'weight'].includes(sortConfig.column)) {
+        valueA = parseFloat(valueA);
+        valueB = parseFloat(valueB);
+
+        if (isNaN(valueA)) valueA = 0;
+        if (isNaN(valueB)) valueB = 0;
+    }
+    // Для дат
+    else if (sortConfig.column === 'birthDate') {
+        try {
+            valueA = new Date(valueA).getTime() || 0;
+            valueB = new Date(valueB).getTime() || 0;
+        } catch {
+            valueA = valueB = 0;
+        }
+    }
+    // Для строк
+    else {
+        valueA = String(valueA).toLowerCase();
+        valueB = String(valueB).toLowerCase();
+
+        return sortConfig.direction === 'asc' 
+            ? valueA.localeCompare(valueB) 
+            : valueB.localeCompare(valueA);
+    }
+
+    // Сравнение чисел/дат
+    if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (valueA > valueB) return sortConfig.direction === 'asc' ? 1 : -1;
+
+    return 0;
+};
+
+const updateSortIndicator = () => {
+    const headers = document.querySelectorAll('#users-table-thead-row th');
+    
+    headers.forEach(header => {
+        header.classList.remove('sort-asc', 'sort-desc');
+        header.textContent = header.textContent.replace(/ [↑↓]$/, '');
+
+        if (header.textContent === currentSort.column) {
+            header.classList.add(`sort-${currentSort.direction}`);
+            header.textContent += currentSort.direction === 'asc' ? ' ↑' : ' ↓';
+        }
+    });
+};
+
 const initUsersTable = async () => {
     allUsers = transformUsers(await getUsers());
 
+    const sortCheckbox = document.getElementById('global-sort-checkbox');
+
+    sortCheckbox.addEventListener('change', (event) => {
+        sortMode = event.target.checked ? 'global' : 'page';
+
+        if (currentSort.column) sortTable(pagination);
+    });
+
     const pagination = new Pagination({
         onPageChange: () => {
-            renderTbodyData(pagination.getPaginatedData(allUsers));
+            if (sortMode === 'page' && currentSort.column) {
+                // В режиме page при переключении страницы применяем сортировку
+                const currentPageData = pagination.getPaginatedData(allUsers);
+
+                currentPageData.sort((a, b) => compareValues(a, b, currentSort));
+
+                renderTbodyData(currentPageData);
+            } else {
+                // В режиме global просто отображаем данные
+                renderTbodyData(pagination.getPaginatedData(allUsers));
+            }
         }
     });
 
     pagination.setTotalItems(allUsers.length);
     pagination.setupPaginationControls();
 
-    renderTheadData(Object.keys(allUsers[0]));
+    renderTheadData(Object.keys(allUsers[0]), pagination);
     renderTbodyData(pagination.getPaginatedData(allUsers));
 
     //const posts = await getPostsByUserID(2);
