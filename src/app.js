@@ -1,7 +1,7 @@
 const COLLAGE = document.getElementById('collage');
 const MODAL = document.getElementById('modal');
 const modalImg = document.getElementById('modal-img');
-const selectLimit = document.getElementById('imgLimit');
+const selectLimit = document.getElementById('img-limit');
 
 let isPaused = false;
 
