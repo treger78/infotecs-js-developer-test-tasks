@@ -258,6 +258,12 @@ const clickUserHandler = () => {
 
         const { posts } = await getPostsByUserID(userID);
 
+        if (posts.length < 1) {
+            MODAL.style.display = 'none';
+
+            return alert('У пользователя пока нет постов!');
+        }
+
         MODAL.style.display = 'flex';
 
         renderUserPosts(posts);
@@ -270,7 +276,7 @@ const closeModalHandlers = () => {
     });
 
     MODAL.addEventListener('click', (event) => {
-        if (event.target.id === 'modal') MODAL.style.display = 'none';
+        if (event.target.id === 'modal' || event.target.id === 'posts-container') MODAL.style.display = 'none';
     });
 };
 
