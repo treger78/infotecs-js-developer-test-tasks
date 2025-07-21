@@ -1,0 +1,45 @@
+#modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 70%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 11;
+}
+
+#close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    background: red;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 100%;
+}
+
+#posts-container {
+    margin-right: 2.5rem;
+    margin-left: 1rem;
+}
+
+#posts-container article {
+    background: white;
+    margin: 1rem;
+    border-radius: 15px;
+}
+
+#posts-container article div {
+    padding: 8px 15px;
+}
+
+.icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}

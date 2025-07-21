@@ -1,5 +1,7 @@
 import  { Pagination } from "./pagination.js";
 
+const MODAL = document.getElementById('modal');
+
 let allUsers = [];
 let sortMode = 'global'; // 'global' или 'page'
 let currentSort = {
@@ -23,7 +25,6 @@ const getUsers = async () => {
     }
 };
 
-//TODO: подумать стоит ли действительно преобразовывать данные
 const transformUsers = (users) => {
     const formatAddress = (obj) => {
         if (!obj) return '';
@@ -245,6 +246,70 @@ const updateSortIndicator = () => {
     });
 };
 
+const clickUserHandler = () => {
+    const tbody = document.getElementById('users-table-tbody');
+
+    tbody.addEventListener('click', async (event) => {
+        const target = event.target;
+
+        if (target.tagName !== 'TD') return;
+
+        const userID = Number(target.parentElement.querySelector('.id').textContent);
+
+        const { posts } = await getPostsByUserID(userID);
+
+        MODAL.style.display = 'flex';
+
+        renderUserPosts(posts);
+    });
+};
+
+const closeModalHandlers = () => {
+    document.getElementById('close-modal-btn').addEventListener('click', () => {
+        MODAL.style.display = 'none';
+    });
+
+    MODAL.addEventListener('click', (event) => {
+        if (event.target.id === 'modal') MODAL.style.display = 'none';
+    });
+};
+
+const renderUserPosts = (posts) => {
+    const postsContainer = document.getElementById('posts-container');
+
+    postsContainer.innerHTML = '';
+
+    posts.forEach(post => {
+        const article = document.createElement('article');
+
+        article.innerHTML = `
+            <div class="post-header">
+                <h3 class="post-title">${post.title}</h3>
+            </div>
+            <div class="post-body">${post.body}</div>
+            <div class="post-tags">
+                ${post.tags.map(tag => `<span>#${tag}</span>`).join('')}
+            </div>
+            <div class="post-reactions">
+                <span class="likes">
+                    <img src="./src/icons/thumbs-up-solid.svg" class="icon">
+                    <span class="count">${post.reactions.likes}</span>
+                </span>
+                <span class="dislikes">
+                    <img src="./src/icons/thumbs-down-solid.svg" class="icon">
+                    <span class="count">${post.reactions.dislikes}</span>
+                </span>
+                <span class="views">
+                    <img src="./src/icons/eye-solid.svg" class="icon">
+                    <span class="count">${post.views}</span>
+                </span>
+            </div>
+        `;
+
+        postsContainer.appendChild(article);
+    });
+};
+
 const initUsersTable = async () => {
     allUsers = transformUsers(await getUsers());
 
@@ -278,14 +343,8 @@ const initUsersTable = async () => {
     renderTheadData(Object.keys(allUsers[0]), pagination);
     renderTbodyData(pagination.getPaginatedData(allUsers));
 
-    //TODO: при клике на строку, находить id этого пользователя, делать запрос постов по id, после
-    //получения ответа отображать слева сайдбар ~на пол ширины страницы для отображения постов
-    //по структуре можно каждый пост сделать div'ом или section, внутри которых данные друг под другом
-    //в следующем порядке: title, body, tags, reactions
-    /*
-    const posts = await getPostsByUserID(2);
-    console.log(posts);
-    */
+    clickUserHandler();
+    closeModalHandlers();
 };
 
 initUsersTable();

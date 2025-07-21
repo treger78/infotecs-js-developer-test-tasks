@@ -2,6 +2,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     padding: 0.5rem 1rem;
     background-color: #f5f5f5;
     border-bottom: 1px solid lightgray;
@@ -22,6 +23,7 @@
 .pagination-navigation {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.5rem;
 }
 
